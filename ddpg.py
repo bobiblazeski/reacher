@@ -80,28 +80,39 @@ class DDPG():
     def __init__(self, state_size, action_size, random_seed=23,
                  fc1_units=96, fc2_units=96, epsilon=1.0, lr_actor=1e-3,
                  lr_critic=1e-3, weight_decay=0):
+        self.state_size = state_size
+        self.action_size = action_size 
+        self.random_seed = random_seed
         self.fc1_units = fc1_units
         self.fc2_units = fc2_units
         self.state_size = state_size
         self.action_size = action_size        
         self.epsilon = epsilon
+        self.lr_actor = lr_actor
+        self.lr_critic = lr_critic
+        self.weight_decay = weight_decay
+        self.noise = OUNoise(action_size, random_seed)
+        random.seed(random_seed)
+        self.recreate()
+        
+        
 
-        self.actor = Actor(state_size, action_size, random_seed,
-                           fc1_units=fc1_units, fc2_units=fc2_units).to(device)
-        self.actor_target = Actor(state_size, action_size, random_seed, 
-                                  fc1_units=fc1_units, fc2_units=fc2_units).to(device)
-        self.actor_optimizer = optim.Adam(self.actor.parameters(), lr=lr_actor)
+    def recreate(self):
+        self.actor = Actor(self.state_size, self.action_size, self.random_seed,
+                           fc1_units=self.fc1_units, fc2_units=self.fc2_units).to(device)
+        self.actor_target = Actor(self.state_size, self.action_size, self.random_seed,
+                                  fc1_units=self.fc1_units, fc2_units=self.fc2_units).to(device)
+        self.actor_optimizer = optim.Adam(self.actor.parameters(), lr=self.lr_actor)
 
-        self.critic = Critic(state_size, action_size, random_seed,
-                             fc1_units=fc1_units, fc2_units=fc2_units).to(device)
-        self.critic_target = Critic(state_size, action_size, random_seed,
-                                    fc1_units=fc1_units, fc2_units=fc2_units).to(device)
-        self.critic_optimizer = optim.Adam(self.critic.parameters(), lr=lr_critic, weight_decay=weight_decay)
-
-        self.noise = OUNoise(action_size, random_seed)                        
+        self.critic = Critic(self.state_size, self.action_size, self.random_seed,
+                             fc1_units=self.fc1_units, fc2_units=self.fc2_units).to(device)
+        self.critic_target = Critic(self.state_size, self.action_size, self.random_seed,
+                                    fc1_units=self.fc1_units, fc2_units=self.fc2_units).to(device)
+        self.critic_optimizer = optim.Adam(self.critic.parameters(), lr=self.lr_critic, 
+                                           weight_decay=self.weight_decay)
+        
         self.hard_copy(self.actor_target, self.actor)
         self.hard_copy(self.critic_target, self.critic)
-        random.seed(random_seed)
 
     def act(self, state, add_noise=True):
         state = torch.from_numpy(state).float().to(device)

@@ -44,6 +44,7 @@ The directory `saves` contains saved weights for 2 different agents:
 * `96_96_108_actor.pth` & `96_96_108_critic.pth` - Agent that learned from scratch in 108 episodes
 * `96_96_80_actor.pth` & `96_96_80_critic.pth` - Agent that learned from above agent experience in 80 episodes
 * `48_48_actor_71.pth` & `48_48_critic_71.pth` - Smaller agent that learned from above agent experience 
+* `96_96_2491_actor.pth` & `96_96_2491_critic.pth` - Learned from scratch from single agent version
 
 Naming convention `Fully connected layer 1`_`Fully connected layer 2`_`Episodes`_`[actor|critic]`.pth
 
